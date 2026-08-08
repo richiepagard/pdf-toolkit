@@ -28,9 +28,11 @@ def reader(pdf_path: str) -> str:
 
     try:
         reader = PdfReader(pdf_path)
+        logger.debug(f"PDF file {pdf_path} opened successfully.")
 
         for page in reader.pages:
-            read_text += page.extract_text()
+            logger.debug(f"Extracting text from page {page.page_number + 1}")
+            read_text += f"\nPage {page.page_number + 1}:\n-------\n{page.extract_text()}\n"
 
     except PyPdfError as pypdferror:
         logger.error(pypdferror)
@@ -42,4 +44,8 @@ def reader(pdf_path: str) -> str:
         # Re-raise the occured exception
         raise
 
+    logger.debug(f"PDF file {pdf_path} read successfully.")
     return read_text
+
+
+print(reader("examples/college_management_system.pdf"))
