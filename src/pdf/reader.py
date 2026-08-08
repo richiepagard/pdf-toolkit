@@ -31,8 +31,11 @@ def reader(pdf_path: str) -> str:
         logger.debug(f"PDF file {pdf_path} opened successfully.")
 
         for page in reader.pages:
-            logger.debug(f"Extracting text from page {page.page_number + 1}")
-            read_text += f"\nPage {page.page_number + 1}:\n-------\n{page.extract_text()}\n"
+            page_number = page.page_number + 1
+            extracted = page.extract_text()
+            read_text += f"\nPage {page_number}:\n-------\n{extracted}\n"
+
+            logger.debug(f"Extracting text from page {page_number}")
 
     except PyPdfError as pypdferror:
         logger.error(pypdferror)
