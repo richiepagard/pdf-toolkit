@@ -13,7 +13,7 @@ from src.utils import base_logger
 
 
 # Config logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("READER")
 base_logger(logger)
 
 
@@ -49,6 +49,3 @@ def reader(pdf_path: str) -> str:
 
     logger.debug(f"PDF file {pdf_path} read successfully.")
     return read_text
-
-
-print(reader("examples/college_management_system.pdf"))
