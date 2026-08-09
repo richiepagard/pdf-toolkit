@@ -4,13 +4,15 @@ Handles writing a file by writing its metadata.
 """
 
 import logging
+from _pyrepl import reader
 from datetime import datetime
 
-from pypdf import PdfWriter
+from pypdf import PdfWriter, PdfReader
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.units import inch
 
 from src.utils import base_logger
+
 
 
 # Config logging
@@ -121,6 +123,47 @@ class Writer:
 		self.canvas.save()
 
 
+
+
+	def metadata_writer(
+		self,
+		title: str = "Test",
+		author: str = "Unknown",
+		subject: str = "",
+		creator: str = "PDF Toolkit",
+		producer: str = "PDF Toolkit",
+		keywords: str = "",
+	) -> Dict[str, str]:
+
+
+		# Build absolute path to the PDF file in a platform-independent way
+		file_path = f"{self.path}/{self.file_name}.pdf"
+
+		try:
+			reader = PdfReader(str(file_path))
+			meta = reader.metadata
+		except PdfReadError as pdf_error:
+			raise ValueError(f"Invalid or corrupted PDF file: {file_path}") from pdf_error
+
+		# If the document contains no metadata, return an empty dictionary
+		if not meta:
+			return {
+				"/Title": title,
+				"/Author": author,
+				"/Subject": subject,
+				"/Creator": creator,
+				"/Producer": producer,
+				"/Keywords": keywords,
+			}
+		# Clean dictionary
+		metadata_dict = {
+			str(key): str(value)
+			for key, value in meta.items()
+			if value not in (None, "")
+		}
+
+		return metadata_dict
+
 writer = Writer(
 	text=[
 		"A clean, modular toolkit for reading, writing, inspecting",
@@ -130,3 +173,5 @@ writer = Writer(
 	]
 )
 writer.content_writer()
+
+writer.metadata_writer()
