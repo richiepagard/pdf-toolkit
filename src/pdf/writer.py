@@ -17,13 +17,6 @@ from src.utils import base_logger
 logger = logging.getLogger("WRITER")
 base_logger(logger)
 
-# Initialize the PdfWriter instance
-WRITER = PdfWriter()
-
-# Format the current date and time for the metadata
-utc_time = "-05'00'"
-time = datetime.now().strftime(f"D\072%Y%m%d%H%M%S{utc_time}")
-
 
 class Writer:
 	"""
