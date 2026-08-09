@@ -4,10 +4,8 @@ Handles writing a file by writing its metadata.
 """
 
 import logging
-from _pyrepl import reader
-from datetime import datetime
 
-from pypdf import PdfWriter, PdfReader
+from pypdf import PdfWriter
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.units import inch
 
@@ -122,47 +120,43 @@ class Writer:
 		# Save the PDF file
 		self.canvas.save()
 
-
-
-
 	def metadata_writer(
 		self,
-		title: str = "Test",
+		title: str = "Undefined",
 		author: str = "Unknown",
-		subject: str = "",
+		subject: str = "Undefined",
 		creator: str = "PDF Toolkit",
 		producer: str = "PDF Toolkit",
-		keywords: str = "",
-	) -> Dict[str, str]:
+	) -> dict:
+		"""
+		Metadata writer to modify and write new metadata
+		for the created PDF document.
 
+		Arguments:
+			title (str): The PDF main title.
+			author (str): The PDF owner and the actual author.
+			subject (str): Represents to the PDF subject.
+			creator (str): The application that originally created the PDF file such as Word or LibreOfficeWriter.
+			producer (str): The software/library that actually generated or exported the PDF file.
+		"""
 
 		# Build absolute path to the PDF file in a platform-independent way
 		file_path = f"{self.path}/{self.file_name}.pdf"
 
-		try:
-			reader = PdfReader(str(file_path))
-			meta = reader.metadata
-		except PdfReadError as pdf_error:
-			raise ValueError(f"Invalid or corrupted PDF file: {file_path}") from pdf_error
-
-		# If the document contains no metadata, return an empty dictionary
-		if not meta:
-			return {
+		# Add new metadata to the new created PDF document
+		self.writer.add_metadata(
+			{
 				"/Title": title,
 				"/Author": author,
 				"/Subject": subject,
 				"/Creator": creator,
-				"/Producer": producer,
-				"/Keywords": keywords,
+				"/Producer": producer
 			}
-		# Clean dictionary
-		metadata_dict = {
-			str(key): str(value)
-			for key, value in meta.items()
-			if value not in (None, "")
-		}
+		)
 
-		return metadata_dict
+		# Commit the changes to the target PDF file
+		self.writer.write(str(file_path))
+
 
 writer = Writer(
 	text=[
@@ -172,6 +166,6 @@ writer = Writer(
 		"making it easy to extract text, images, and metadata, as well as to create new PDF documents.",
 	]
 )
-writer.content_writer()
 
+writer.content_writer()
 writer.metadata_writer()
