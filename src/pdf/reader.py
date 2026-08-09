@@ -13,7 +13,7 @@ from src.utils import base_logger
 
 
 # Config logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("READER")
 base_logger(logger)
 
 
@@ -31,8 +31,11 @@ def reader(pdf_path: str) -> str:
         logger.debug(f"PDF file {pdf_path} opened successfully.")
 
         for page in reader.pages:
-            logger.debug(f"Extracting text from page {page.page_number + 1}")
-            read_text += f"\nPage {page.page_number + 1}:\n-------\n{page.extract_text()}\n"
+            page_number = page.page_number + 1
+            extracted = page.extract_text()
+            read_text += f"\nPage {page_number}:\n-------\n{extracted}\n"
+
+            logger.debug(f"Extracting text from page {page_number}")
 
     except PyPdfError as pypdferror:
         logger.error(pypdferror)
@@ -46,6 +49,3 @@ def reader(pdf_path: str) -> str:
 
     logger.debug(f"PDF file {pdf_path} read successfully.")
     return read_text
-
-
-print(reader("examples/college_management_system.pdf"))
