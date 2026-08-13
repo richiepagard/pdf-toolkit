@@ -46,7 +46,7 @@ class Metadata:
         returns the final 'data' result.
         """
         data = {}
-        
+
         try:
             logger.debug(f"PDF file {self.file_path} opened successfully.")
 
