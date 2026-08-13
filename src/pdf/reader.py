@@ -17,35 +17,54 @@ logger = logging.getLogger("READER")
 base_logger(logger)
 
 
-def reader(pdf_path: str) -> str:
+class Reader:
     """
-    Reading the PDF file content from all pages.
+    Managing the PDF document retrieving / reading.
+    Only handles the file reading, but in different formats
+    and approaches of file reading content.
 
-    Arguments:
-        pdf_path (str): Path to the PDF file.
+    Attributes:
+        reader (PdfReader obj): Defining an object of PdfReader to access the methods
+            and manipulating the data or content.
     """
-    read_text = ""
 
-    try:
-        reader = PdfReader(pdf_path)
-        logger.debug(f"PDF file {pdf_path} opened successfully.")
+    def __init__(self, file_path: str) -> None:
+        """
+        Initializing the class and its attributes.
+        Defines the important attributes.
 
-        for page in reader.pages:
-            page_number = page.page_number + 1
-            extracted = page.extract_text()
-            read_text += f"\nPage {page_number}:\n-------\n{extracted}\n"
+        Arguments:
+            file_path (str): The actual path of the PDF file.
+        """
 
-            logger.debug(f"Extracting text from page {page_number}")
+        self.file_path = file_path
+        self.reader = PdfReader(file_path)
 
-    except PyPdfError as pypdferror:
-        logger.error(pypdferror)
-        # Re-raise the occured exception
-        raise
+    def content_reader(self) -> str:
+        """
+        Reading the PDF file content from all pages.
+        """
+        read_text = ""
 
-    except Exception as occured_exception:
-        logger.error(occured_exception)
-        # Re-raise the occured exception
-        raise
+        try:
+            logger.debug(f"PDF file {self.file_path} opened successfully.")
 
-    logger.debug(f"PDF file {pdf_path} read successfully.")
-    return read_text
+            for page in self.reader.pages:
+                page_number = page.page_number + 1
+                extracted = page.extract_text()
+                read_text += f"\nPage {page_number}:\n-------\n{extracted}\n"
+
+                logger.debug(f"Extracting text from page {page_number}")
+
+        except PyPdfError as pypdferror:
+            logger.error(pypdferror)
+            # Re-raise the occured exception
+            raise
+
+        except Exception as occured_exception:
+            logger.error(occured_exception)
+            # Re-raise the occured exception
+            raise
+
+        logger.debug(f"PDF file {self.file_path} read successfully.")
+        return read_text
