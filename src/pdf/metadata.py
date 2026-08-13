@@ -1,0 +1,83 @@
+"""
+Metadata module of the PDF toolkit.
+Hanldes the whole metadata content and metadata manipulation,
+also processing the file with validations and handling the exceptions.
+"""
+
+import logging
+import pprint
+
+from pypdf import PdfReader
+from pypdf.errors import PyPdfError
+
+from src.utils import base_logger
+
+
+# Config logging
+logger = logging.getLogger("METADATA")
+base_logger(logger)
+
+
+class Metadata:
+    """
+    Managing the PDF document metadata.
+    Only handles the file metadata such as retrieving and manipulating.
+
+    Attributes:
+        reader (PdfReader obj): Defining an object of PdfReader to first read the file.
+    """
+
+    def __init__(self, file_path: str) -> None:
+        """
+        Initializing the class and its attributes.
+        Defines the important attributes.
+
+        Arguments:
+            file_path (str): The actual path of the PDF file will manage its metadata.
+        """
+
+        self.file_path = file_path
+        self.reader = PdfReader(file_path)
+
+    def file_metadata(self):
+        """
+        Getting the file metadata and format its keys by ignoring
+        the '/' before each key. Handles the PyPdfError and logs it,
+        returns the final 'data' result.
+        """
+        data = {}
+        
+        try:
+            logger.debug(f"PDF file {self.file_path} opened successfully.")
+
+            for key, value in self.reader.metadata.items():
+                # Filter the keys to ignore the '/' (e.g. '/Title' becomes 'Title')
+                key = str(key).strip('/')
+                data[key] = value
+
+        except PyPdfError as pypdferror:
+            logger.error(pypdferror)
+            # Re-raise the occured exception
+            raise
+
+        except Exception as occured_exception:
+            logger.error(occured_exception)
+            # Re-raise the occured exception
+            raise
+
+        return data
+
+    def __str__(self) -> str:
+        """
+        Format the output string of an object. Returns the retuned data
+        from the 'file_metadata' method and format it with 'pprint'
+        to print the data in a prettier way like JSON formating.
+        """
+        printer = pprint.PrettyPrinter(indent=4)
+        result = printer.pformat(self.file_metadata())
+
+        return result.replace("{", "{\n ", 1).rsplit("}", 1)[0] + "\n}"
+
+
+meta = Metadata("examples/college_management_system.pdf")
+print(str(meta))
