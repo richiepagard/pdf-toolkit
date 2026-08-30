@@ -11,7 +11,6 @@ from pypdf.errors import PyPdfError
 
 from src.utils import base_logger
 
-
 # Config logging
 logger = logging.getLogger("READER")
 base_logger(logger)
@@ -68,3 +67,7 @@ class Reader:
 
         logger.debug(f"PDF file {self.file_path} read successfully.")
         return read_text
+
+    @property
+    def pages(self) -> int:
+        return len(self.reader.pages)
