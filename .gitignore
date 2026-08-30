@@ -156,6 +156,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+# The SublimeText for the LSP-pyright package to determine the virtualenvironment for it
+pyrightconfig.json
 
 # Spyder project settings
 .spyderproject
