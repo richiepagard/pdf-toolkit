@@ -29,8 +29,9 @@ class TestReader(unittest.TestCase):
 
 	def test_invalid_pdf_file(self):
 		"""
-		Tests the PDF document validation to ensure
-		the content is returned properly.
+		Tests the PDF document validation to ensure the created file
+		is a valid PDF file or not, all the created file with '.pdf' suffix
+		are not a valid PDF file.
 		"""
 		with NamedTemporaryFile(suffix=".pdf") as file:
 			file.write(b"This is not a real PDF!")
