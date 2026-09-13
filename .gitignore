@@ -219,7 +219,9 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-
 # Extrafiles
 */sample.pdf
 sample.pdf
+
+# Swap files (ignoring opening files on VIM)
+*.swp
