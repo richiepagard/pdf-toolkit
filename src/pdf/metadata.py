@@ -55,7 +55,7 @@ class Metadata:
 
             for key, value in self.reader.metadata.items():
                 # Filter the keys to ignore the '/' (e.g. '/Title' becomes 'Title')
-                key = str(key).strip('/')
+                key = str(key).strip("/")
 
                 # Filter the creation datetime to show more human readable
                 if key == "CreationDate":
@@ -79,13 +79,13 @@ class Metadata:
 
     def add_metadata(
         self,
-        author: str = None,
-        producer: str = None,
-        title: str = None,
-        subject: str = None,
-        creator: str = None,
-        creation_date: str = None,
-        creation_time: str = None,
+        author: str = "Unknown",
+        producer: str = "Undefined",
+        title: str = "-",
+        subject: str = "-",
+        creator: str = "Undefined",
+        creation_date: str = "-",
+        creation_time: str = "-",
     ):
         """
         Adding metadata to the file if it does not contain any metadata.
@@ -102,9 +102,11 @@ class Metadata:
             "/Subject": subject,
         }
         _might_default = {
-            "/CreationDate": self._creation_datetime_format(creation_date, creation_time),
+            "/CreationDate": self._creation_datetime_format(
+                creation_date, creation_time
+            ),
             "/Creator": self.reader.metadata.creator or creator,
-            "/Producer": self.reader.metadata.producer or producer
+            "/Producer": self.reader.metadata.producer or producer,
         }
         final_data = {**_basic_metadata, **_might_default}
 
@@ -136,8 +138,7 @@ class Metadata:
 
         # Format the sent datetime provided by method arguments
         cleaned_datetime = datetime.strptime(
-            f"{creation_date} {creation_time}",
-            "%Y-%m-%d %H:%M:%S"
+            f"{creation_date} {creation_time}", "%Y-%m-%d %H:%M:%S"
         )
 
         # Retuens the appropriate datetime format for the PDF document metadata creation date
@@ -153,8 +154,3 @@ class Metadata:
         result = printer.pformat(self.file_metadata())
 
         return result.replace("{", "{\n ", 1).rsplit("}", 1)[0] + "\n}"
-
-
-metadata = Metadata("examples/college_management_system.pdf")
-
-print(str(metadata))

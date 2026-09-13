@@ -11,7 +11,6 @@ from pypdf.errors import PyPdfError
 
 from src.utils import base_logger
 
-
 # Config logging
 logger = logging.getLogger("READER")
 base_logger(logger)
@@ -52,7 +51,10 @@ class Reader:
             for page in self.reader.pages:
                 page_number = page.page_number + 1
                 extracted = page.extract_text()
-                read_text += f"\nPage {page_number}:\n-------\n{extracted}\n"
+
+                # Fill the read-text only if anything extracted from the document
+                if extracted and extracted.strip():
+                    read_text += f"\nPage {page_number}:\n-------\n{extracted}\n"
 
                 logger.debug(f"Extracting text from page {page_number}")
 
@@ -66,5 +68,14 @@ class Reader:
             # Re-raise the occured exception
             raise
 
+        # Checks if the extracted text from the PDF contains nothing,
+        # return the fully status message as result
+        if not read_text.strip():
+            return f"PDF contains nothing, but {self.pages} pages..."
+
         logger.debug(f"PDF file {self.file_path} read successfully.")
         return read_text
+
+    @property
+    def pages(self) -> int:
+        return len(self.reader.pages)
