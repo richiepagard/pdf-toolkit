@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pdf-toolkit"
+version = "0.2.4"
+authors = [
+	{ name="Richie", email="richiepagard@gmail.com" },
+]
+description = "A clean, modular toolkit for reading, writing, inspecting, and manipulating PDF documents with Python and pypdf."
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"Operating System :: POSIX :: Linux"
+]
+license = "MIT"
+license-files = ["Licen[CS]E*"]
+dependencies = [
+	"charset-normalizer>=3.4.9",
+	"colorama>=0.4.6",
+	"iniconfig>=2.3.0",
+	"packaging>=26.3",
+	"pillow>=12.3.0",
+	"pluggy>=1.6.0",
+	"Pygments>=2.21.0",
+	"pypdf>=6.15.0",
+	"reportlab>=5.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+	"pytest>=9.1.1",
+	"pylint>=3.2",
+	"mypy>=1.10"
+]
+
+[project.urls]
+Homepage = "https://github.com/richiepagard/pdf-toolkit/"
+Issues = "https://github.com/richiepagard/pdf-toolkit/issues/"
+
+
+### TOOLS
+
+[tool.mypy]
+python_version = ">=3.9"
+strict = true
+
+[tool.pylint.message_control]
+disable = [
+	"missing-module-docstring",	# C0114
+]
+[tool.pylint.format]
+max-line-length = 80
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pdf"]
