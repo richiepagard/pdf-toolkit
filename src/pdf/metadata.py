@@ -78,10 +78,7 @@ class Metadata:
                 if key == "CreationDate":
                     _datetime = str(value).replace("'", "")
                     _datetime = datetime.strptime(_datetime, "D:%Y%m%d%H%M%S%z")
-                    value = (
-                        f"{_datetime.year}-{_datetime.month}-{_datetime.day} "
-                        f"{_datetime.hour}:{_datetime.minute}:{_datetime.second}"
-                    )
+                    value = _datetime.strftime("%Y-%m-%d %H:%M:%S")
 
                 data[key] = value
 
