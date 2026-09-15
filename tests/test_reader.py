@@ -1,13 +1,3 @@
-"""
-Tests the PDF Reader module's Reader class.
-
-- Tests valid PDF to ensure content is returned.
-- Tests multiple pages to ensure all pages are read.
-- Checks invalid or nonexistent path for file not found exceptions.
-- Tests the corrupted PDF exception from PdfReader exception.
-- Tests that the PdfError raised appropriately.
-"""
-
 import unittest
 from tempfile import NamedTemporaryFile
 
