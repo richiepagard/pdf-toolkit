@@ -7,6 +7,7 @@ also processing the file with validations and handling the exceptions.
 import logging
 import pprint
 from datetime import datetime
+from dataclasses import dataclass
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.errors import PyPdfError
@@ -19,14 +20,29 @@ logger = logging.getLogger("METADATA")
 base_logger(logger)
 
 
+@dataclass
+class AddMetadataInstances:
+    """
+    The default instance attributes for adding metadata to a PDF document.
+    Uses for modifying and adding new metadata, only preparing the instances.
+    """
+    author: str = "Unknown"
+    producer: str = "Undefined"
+    title: str = "-"
+    subject: str = "-"
+    creator: str = "Undefined"
+    creation_date: str = "-"
+    creation_time: str = "-"
+
+
 class Metadata:
     """
     Managing the PDF document metadata.
     Only handles the file metadata such as retrieving and manipulating.
 
     Attributes:
-        reader (PdfReader obj): Defining an object of PdfReader to first read the file.
-        writer (PdfWriter obj): Defining an object of PdfWriter to writes metadata on the document.
+        reader (PdfReader obj): Defining an object of PdfReader.
+        writer (PdfWriter obj): Defining an object of PdfWriter.
     """
 
     def __init__(self, file_path: str) -> None:
@@ -42,7 +58,7 @@ class Metadata:
         self.reader = PdfReader(file_path)
         self.writer = PdfWriter()
 
-    def file_metadata(self):
+    def file_metadata(self) -> dict:
         """
         Getting the file metadata and format its keys by ignoring
         the '/' before each key. Handles the PyPdfError and logs it,
@@ -51,17 +67,21 @@ class Metadata:
         data = {}
 
         try:
-            logger.debug(f"PDF file {self.file_path} opened successfully.")
+            logger.debug("PDF file %s opened successfully.", self.file_path)
 
             for key, value in self.reader.metadata.items():
-                # Filter the keys to ignore the '/' (e.g. '/Title' becomes 'Title')
+                # Filter the keys to ignore the '/',
+                # '/Title' becomes 'Title' etc
                 key = str(key).strip("/")
 
                 # Filter the creation datetime to show more human readable
                 if key == "CreationDate":
                     _datetime = str(value).replace("'", "")
                     _datetime = datetime.strptime(_datetime, "D:%Y%m%d%H%M%S%z")
-                    value = f"{_datetime.year}-{_datetime.month}-{_datetime.day} {_datetime.hour}:{_datetime.minute}:{_datetime.second}"
+                    value = (
+                        f"{_datetime.year}-{_datetime.month}-{_datetime.day} "
+                        f"{_datetime.hour}:{_datetime.minute}:{_datetime.second}"
+                    )
 
                 data[key] = value
 
@@ -79,13 +99,7 @@ class Metadata:
 
     def add_metadata(
         self,
-        author: str = "Unknown",
-        producer: str = "Undefined",
-        title: str = "-",
-        subject: str = "-",
-        creator: str = "Undefined",
-        creation_date: str = "-",
-        creation_time: str = "-",
+        metadata: AddMetadataInstances
     ):
         """
         Adding metadata to the file if it does not contain any metadata.
@@ -96,17 +110,17 @@ class Metadata:
         final_data = {}
 
         _basic_metadata = {
-            "/Author": author,
-            "/Producer": producer,
-            "/Title": title,
-            "/Subject": subject,
+            "/Author": metadata.author,
+            "/Producer": metadata.producer,
+            "/Title": metadata.title,
+            "/Subject": metadata.subject,
         }
         _might_default = {
             "/CreationDate": self._creation_datetime_format(
-                creation_date, creation_time
+                metadata.creation_date, metadata.creation_time
             ),
-            "/Creator": self.reader.metadata.creator or creator,
-            "/Producer": self.reader.metadata.producer or producer,
+            "/Creator": self.reader.metadata.creator or metadata.creator,
+            "/Producer": self.reader.metadata.producer or metadata.producer,
         }
         final_data = {**_basic_metadata, **_might_default}
 
@@ -116,19 +130,23 @@ class Metadata:
         self.writer.metadata = final_data
         self.writer.write(self.file_path)
 
-    def _creation_datetime_format(self, creation_date: str, creation_time: str) -> str:
+    def _creation_datetime_format(
+        self,
+        creation_date: str,
+        creation_time: str
+    ) -> str:
         """
-        Helper function to format the creation date and time metadata of the PDF document.
+        Helper function to format the PDF document's creation datetime metadata.
         If the document has a Creation Date, the formatted datetime keeps
         in the current datetime of document. But if does not contain any,
-        the formatted datetime set to the sent date from the client which provided
-        by the function arguments.
+        the formatted datetime set to the sent date from the client
+        which provided by the function arguments.
 
         Arguments:
-            creation_date (str): The creation date client sent to set as document's metadata.
-                It's format: "<year>-<month>-<day>".
-            creation_time (str): The creation time client sent to set as document's metadata.
-                It's format: "<hour>:<minute>:<second>".
+            creation_date (str): The creation date client sent to set
+                as document's metadata. It's format: "<year>-<month>-<day>".
+            creation_time (str): The creation time client sent to set
+                as document's metadata. It's format: "<hour>:<minute>:<second>".
         """
 
         # Gets document existed creation date if contain
@@ -141,7 +159,8 @@ class Metadata:
             f"{creation_date} {creation_time}", "%Y-%m-%d %H:%M:%S"
         )
 
-        # Retuens the appropriate datetime format for the PDF document metadata creation date
+        # Retuens the appropriate datetime format
+        # for the PDF document metadata creation date
         return cleaned_datetime.strftime("D:%Y%m%d%H%M%S+00'00'")
 
     def __str__(self) -> str:
