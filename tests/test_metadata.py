@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 from tempfile import NamedTemporaryFile
 
 from reportlab.pdfgen.canvas import Canvas
@@ -67,6 +68,23 @@ class TestMetadata(unittest.TestCase):
 
             for key in _uncleaned_keys:
                 self.assertNotIn(key, metadata.keys())
+
+    @patch("src.pdf.metadata.PdfReader")
+    def test_creation_date_format(self, mock_pdf_reader):
+        """
+        Tests if the PDF Document's CreationDate formatted as clean as excepted.
+        """
+        mock_pdf_reader.return_value.metadata = {
+            "/CreationDate": "D:20200102123456+00'00'"
+        }
+
+        metadata = Metadata("fake.pdf")
+        result = metadata.file_metadata()
+
+        self.assertEqual(
+            result["CreationDate"],
+            "2020-01-02 12:34:56"
+        )
 
 
 if __name__ == "__main__":
