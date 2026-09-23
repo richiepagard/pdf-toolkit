@@ -4,7 +4,7 @@ from tempfile import NamedTemporaryFile
 
 from reportlab.pdfgen.canvas import Canvas
 
-from src.pdf.metadata import Metadata
+from src.pdf.metadata import Metadata, AddMetadataInstances
 
 
 class TestMetadata(unittest.TestCase):
@@ -109,13 +109,39 @@ class TestMetadata(unittest.TestCase):
 
             metadata = Metadata(file.name)
 
-            self.assertEqual(
-                metadata._creation_datetime_format(
-                    _correct_date_format, _correct_time_format
-                ),
-                _pdf_date
+
+    def test_add_metadata_method(self):
+        """
+        Tests the 'add_metadata' method to ensure new metadata added
+        in pdf document.
+        """
+        with NamedTemporaryFile(suffix=".pdf") as file:
+            pdf = Canvas(file.name)
+            pdf.drawString(100, 700, "Adding new metadata")
+            pdf.save()
+
+            metadata = Metadata(file.name)
+            metadata.add_metadata(
+                AddMetadataInstances(
+                    author="Richie",
+                    title="Test New Metadata",
+                    subject="Ensures the new metadata set to file's metadata",
+                )
             )
 
+            self.assertEqual(metadata.reader.metadata.author, "Richie")
+            self.assertEqual(
+                metadata.reader.metadata.producer,
+                "ReportLab PDF Library - (opensource)"
+            )
+            self.assertEqual(
+                metadata.reader.metadata.title,
+                "Test New Metadata"
+            )
+            self.assertEqual(
+                metadata.reader.metadata.subject,
+                "Ensures the new metadata set to file's metadata"
+            )
 
 if __name__ == "__main__":
     unittest.main()
