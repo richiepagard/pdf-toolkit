@@ -86,6 +86,36 @@ class TestMetadata(unittest.TestCase):
             "2020-01-02 12:34:56"
         )
 
+    def test_creation_datetime_format_method(self):
+        """
+        Tests the '_creation_datetime_format' helper function
+        to ensure it returns the correct PDF Creation datetime format.
+        """
+        _correct_date_format = "2026-09-23"
+        _correct_time_format = "21:27:34"
+        _wrong_date_format = "2026/09/23"
+        _wrong_time_format = "21,27,34"
+        _pdf_date = "D:20260923212734+00'00'"
+
+        with NamedTemporaryFile(suffix=".pdf") as file:
+            pdf = Canvas(file.name)
+            pdf.drawString(
+                100,
+                700,
+                "The creation date time is a helper function to clean the date time format of PDF Document."
+            )
+            pdf._doc.info.creationDate = _pdf_date
+            pdf.save()
+
+            metadata = Metadata(file.name)
+
+            self.assertEqual(
+                metadata._creation_datetime_format(
+                    _correct_date_format, _correct_time_format
+                ),
+                _pdf_date
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
