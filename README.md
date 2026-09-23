@@ -27,10 +27,13 @@ The project focuses on building a clean and modular API around common PDF operat
 ```text
 pdf-toolkit/
 ├── pdf_toolkit/
-│   ├── reader.py
-│   ├── writer.py
-│   ├── editor.py
-│   └── ...
+│   ├── src
+│   │   ├── pdf
+│   │   │   ├── reader.py
+│   │   │   ├── writer.py
+│   │   │   ├── metadata.py
+│   │   │   └── ...
+│
 ├── tests/
 ├── examples/
 ├── pyproject.toml
