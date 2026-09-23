@@ -126,6 +126,8 @@ class Metadata:
 
         self.writer.metadata = final_data
         self.writer.write(self.file_path)
+        # Recreating the Reader instance to reload the file info
+        self.reader = PdfReader(self.file_path)
 
     def _creation_datetime_format(
         self,
